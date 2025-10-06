@@ -37,6 +37,7 @@ Options:
   -C, --min-clen <#>       The minimum length of the c-segment. Default = 1
   -r, --rolling-limit      If set, the limit will be adjusted whenever a shorter program is found.
   -u, --unique-cells       If set, each used cell used for output will be unique.
+      --full-program       Print the full BF program for each solution.
   -?, --help               Display this help text.
 ```
 

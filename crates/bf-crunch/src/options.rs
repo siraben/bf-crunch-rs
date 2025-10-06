@@ -142,6 +142,14 @@ pub struct Options {
     )]
     pub unique_cells: bool,
 
+    /// Print the full BF program for each solution.
+    #[arg(
+        long = "full-program",
+        action = ArgAction::SetTrue,
+        help = "Print the full BF program for each solution."
+    )]
+    pub full_program: bool,
+
     /// Display this help text.
     #[arg(short = '?', long = "help", action = ArgAction::Help, help = "Display this help text.")]
     pub _help: Option<bool>,

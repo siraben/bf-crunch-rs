@@ -1,4 +1,5 @@
 use std::cmp::{max, min};
+use std::collections::BTreeMap;
 
 use anyhow::Result;
 
@@ -24,6 +25,7 @@ pub struct Cruncher {
     limit: i32,
     rolling_limit: bool,
     unique_cells: bool,
+    print_full_program: bool,
 }
 
 impl Cruncher {
@@ -56,6 +58,7 @@ impl Cruncher {
             limit,
             rolling_limit,
             unique_cells: options.unique_cells,
+            print_full_program: options.full_program,
         })
     }
 
@@ -148,9 +151,10 @@ impl Cruncher {
         let solution1 = solver1.solve(self.limit - len);
 
         if let Some(ref path1) = solution1 {
-            self.report_solution(len, pntr, max_pntr, s, c, k, j, h, &tape, path1);
+            let final_length =
+                self.report_solution(len, pntr, max_pntr, s, c, k, j, h, &tape, path1);
             if self.rolling_limit {
-                self.limit = path1.cost() + len;
+                self.limit = final_length;
             }
         }
 
@@ -179,11 +183,11 @@ impl Cruncher {
                     let sneg: Vec<i32> = s.iter().map(|v| -*v).collect();
                     let kneg = [-k[0], -k[1]];
                     let jneg = [-j[0], j[1]];
-                    self.report_solution(
+                    let final_length = self.report_solution(
                         len, pntr, max_pntr, &sneg, c, &kneg, &jneg, -h, &tape, &path2,
                     );
                     if self.rolling_limit {
-                        self.limit = path2.cost() + len;
+                        self.limit = final_length;
                     }
                 }
             }
@@ -202,21 +206,31 @@ impl Cruncher {
         h: i32,
         tape: &[u8],
         path: &crate::path::Path,
-    ) {
-        let program = to_bf_string(s, c, k, j, h);
-        println!("{}: {}", path.cost() + len, program);
-        println!("{}, {}", pntr, path);
+    ) -> i32 {
+        let init_segment = to_bf_string(s, c, k, j, h);
+        let tail_segment = build_output_sequence(path, &self.goal, tape, pntr);
+        let full_program = format!("{}{}", init_segment, tail_segment);
+        let program_len = full_program.len() as i32;
 
-        let min_pointer = path.iter().map(|node| node.pointer).min().unwrap_or(pntr);
-        let start = min_pointer.max(0) as usize;
-        let count = (max_pntr - min_pointer).max(0) as usize;
-        let end = tape.len().min(start.saturating_add(count));
-        let cells = tape[start..end]
-            .iter()
-            .map(|b| b.to_string())
-            .collect::<Vec<_>>()
-            .join(", ");
-        println!("{}", cells);
+        if self.print_full_program {
+            println!("{}: {}", program_len, full_program);
+        } else {
+            println!("{}: {}", path.cost() + len, init_segment);
+            println!("{}, {}", pntr, path);
+
+            let min_pointer = path.iter().map(|node| node.pointer).min().unwrap_or(pntr);
+            let start = min_pointer.max(0) as usize;
+            let count = (max_pntr - min_pointer).max(0) as usize;
+            let end = tape.len().min(start.saturating_add(count));
+            let cells = tape[start..end]
+                .iter()
+                .map(|b| b.to_string())
+                .collect::<Vec<_>>()
+                .join(", ");
+            println!("{}", cells);
+        }
+
+        program_len
     }
 
     fn fill_tape(
@@ -355,6 +369,57 @@ fn to_bf_string(s: &[i32], c: &[i32], k: &[i32; 2], j: &[i32; 2], h: i32) -> Str
     sb.push(']');
 
     sb
+}
+
+fn build_output_sequence(
+    path: &crate::path::Path,
+    goal: &[u8],
+    tape: &[u8],
+    start_pointer: i32,
+) -> String {
+    let mut sequence = String::new();
+    let mut pointer = start_pointer;
+    let mut state: BTreeMap<i32, u8> = tape
+        .iter()
+        .enumerate()
+        .map(|(idx, &val)| (idx as i32, val))
+        .collect();
+
+    for (step_index, node) in path.iter().enumerate() {
+        let target = node.pointer;
+        if target > pointer {
+            for _ in 0..(target - pointer) {
+                sequence.push('>');
+            }
+        } else if target < pointer {
+            for _ in 0..(pointer - target) {
+                sequence.push('<');
+            }
+        }
+        pointer = target;
+
+        let desired = goal.get(step_index).copied().unwrap_or(0);
+        let current = *state.get(&target).unwrap_or(&0);
+        if desired != current {
+            let increase = desired.wrapping_sub(current);
+            let decrease = current.wrapping_sub(desired);
+            if increase <= decrease {
+                for _ in 0..(increase as usize) {
+                    sequence.push('+');
+                }
+                state.insert(target, current.wrapping_add(increase));
+            } else {
+                for _ in 0..(decrease as usize) {
+                    sequence.push('-');
+                }
+                state.insert(target, current.wrapping_sub(decrease));
+            }
+        }
+
+        sequence.push('.');
+    }
+
+    sequence
 }
 
 fn append_repeated(sb: &mut String, ch: char, count: i32) {
