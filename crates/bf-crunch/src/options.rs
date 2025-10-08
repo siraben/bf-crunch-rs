@@ -1,40 +1,12 @@
 use clap::{ArgAction, Parser};
 
-const HELP_TEXT: &str = "\
-Usage: bfcrunch [--options] text [limit]
-
-Crunches BF programs to produce a given text.
-
-Arguments
-------------------------------------------------------------
-  text             The text to produce.
-  limit            The maximum BF program length to search for. If empty, the length of the shortest program found so far will be used (-r). Default = (empty)
-
-Options
-------------------------------------------------------------
-  -i, --max-init=# The maximum length of the initialization segment. If empty, the program will run indefinitely. Default = (empty)
-  -I, --min-init=# The minimum length of the initialization segment. Default = 14
-  -t, --max-tape=# The maximum tape size to consider. Programs that utilize more tape than this will be ignored. Default = 1250
-  -T, --min-tape=# The minimum tape size to consider. Programs that utilize less tape than this will be ignored. Default = 1
-  -n, --max-node-cost=# The maximum cost for any node. Default = 20
-  -l, --max-loops=# The maximum number of iterations of the main loop. Default = 30000
-  -s, --max-slen=# The maximum length of the s-segment. Default = (empty)
-  -S, --min-slen=# The minimum length of the s-segment. Default = 1
-  -c, --max-clen=# The maximum length of the c-segment. Default = (empty)
-  -C, --min-clen=# The minimum length of the c-segment. Default = 1
-  -r, --rolling-limit If set, the limit will be adjusted whenever a shorter program is found.
-  -u, --unique-cells If set, each used cell used for output will be unique.
-  -?, --help       Display this help text.
-";
-
 #[derive(Parser, Debug, Clone)]
 #[command(
     name = "bfcrunch",
     disable_help_flag = true,
     disable_help_subcommand = true,
     override_usage = "bfcrunch [--options] text [limit]",
-    about = "Crunches BF programs to produce a given text.",
-    help_template = HELP_TEXT
+    about = "Crunches BF programs to produce a given text."
 )]
 pub struct Options {
     /// The text to produce.

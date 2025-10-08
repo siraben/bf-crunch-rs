@@ -1,14 +1,5 @@
-# Port of BF Crunch to Rust
 
-This repository is a port of the legendary
-[BF-Crunch](https://github.com/primo-ppcg/BF-Crunch) project that was
-used in this [StackExchange code
-golf](https://codegolf.stackexchange.com/questions/55422/hello-world/163590#163590)
-to find the shortest BF at the time to output hello world. Here I'm
-mostly using [Codex](https://chatgpt.com/codex) to automate the port,
-and adding extra features and performance improvements over the
-original. The first commit aims to be just the port of the program to
-Rust without any behavioral changes.
+## Description
 
 Crunches BF programs of the form
 ```
@@ -22,48 +13,40 @@ The shortest useful program of this type has length 14:
 ```
 which computes the powers of 2 as _f<sub>n</sub> = 2*f<sub>n-1</sub>_, _f<sub>0</sub> = 1_
 
-## Usage ##
+## Usage
 
 ```
-Usage: bfcrunch [--options] text [limit]
-
 Crunches BF programs to produce a given text.
 
-Arguments
-------------------------------------------------------------
-  text              The text to produce.
-  limit             The maximum BF program length to search for. If empty, the length of the
-                    shortest program found so far will be used (-r). Default = (empty)
+Usage: bfcrunch [--options] text [limit]
 
-Options
-------------------------------------------------------------
-  -i, --max-init=#  The maximum length of the initialization segment. If empty, the program
-                    will run indefinitely. Default = (empty)
-  -I, --min-init=#  The minimum length of the initialization segment. Default = 14
-  -t, --max-tape=#  The maximum tape size to consider. Programs that utilize more tape than
-                    this will be ignored. Default = 1250
-  -T, --min-tape=#  The minimum tape size to consider. Programs that utilize less tape than
-                    this will be ignored. Default = 1
-  -n, --max-node-cost=#
-                    The maximum cost for any node. Default = 20
-  -l, --max-loops=#
-                    The maximum number of iterations of the main loop. Default = 30000
-  -s, --max-slen=#  The maximum length of the s-segment. Default = (empty)
-  -S, --min-slen=#  The minimum length of the s-segment. Default = 1
-  -c, --max-clen=#  The maximum length of the c-segment. Default = (empty)
-  -C, --min-clen=#  The minimum length of the c-segment. Default = 1
-  -r, --rolling-limit
-                    If set, the limit will be adjusted whenever a shorter program is found.
-  -u, --unique-cells
-                    If set, each used cell used for output will be unique.
-  -?, --help        Display this help text.
+Arguments:
+  <text>   The text to produce.
+  [limit]  The maximum BF program length to search for. If empty, the length of the shortest program found so far will be used (-r). Default = (empty)
+
+Options:
+  -i, --max-init <#>       The maximum length of the initialization segment. If empty, the program will run indefinitely. Default = (empty)
+  -I, --min-init <#>       The minimum length of the initialization segment. Default = 14
+  -t, --max-tape <#>       The maximum tape size to consider. Programs that utilize more tape than this will be ignored. Default = 1250
+  -T, --min-tape <#>       The minimum tape size to consider. Programs that utilize less tape than this will be ignored. Default = 1
+  -n, --max-node-cost <#>  The maximum cost for any node. Default = 20
+  -l, --max-loops <#>      The maximum number of iterations of the main loop. Default = 30000
+  -s, --max-slen <#>       The maximum length of the s-segment. Default = (empty)
+  -S, --min-slen <#>       The minimum length of the s-segment. Default = 1
+  -c, --max-clen <#>       The maximum length of the c-segment. Default = (empty)
+  -C, --min-clen <#>       The minimum length of the c-segment. Default = 1
+  -r, --rolling-limit      If set, the limit will be adjusted whenever a shorter program is found.
+  -u, --unique-cells       If set, each used cell used for output will be unique.
+  -?, --help               Display this help text.
 ```
 
 ## Output ##
 
 Output is given in three lines:
  1. Total length of the program found, and the initialization segment.
- 2. Path taken, starting with the current tape pointer. Each node corresponds to one character of output, represented as (pointer, cost).
+ 2. Path taken, starting with the current tape pointer. Each node
+    corresponds to one character of output, represented as (pointer,
+    cost).
  3. Utilized tape segment.
  
 For example, the final result for `bfcrunch "hello world" 70 -r -i23` is:
@@ -76,3 +59,14 @@ This corresponds to the full program:
 ```
 ++++[[<+>->+++++>+<<]>]<<<<.<+.>++++..+++.<<<.>+++.>>.+++.>.<<-.
 ```
+
+## Notes on Rust Port
+This repository is a port of the legendary
+[BF-Crunch](https://github.com/primo-ppcg/BF-Crunch) project that was
+used in this [StackExchange code
+golf](https://codegolf.stackexchange.com/questions/55422/hello-world/163590#163590)
+to find the shortest BF at the time to output hello world. Here I'm
+mostly using [Codex](https://chatgpt.com/codex) to automate the port,
+and adding extra features and performance improvements over the
+original. The first commit aims to be just the port of the program to
+Rust without any behavioral changes.
