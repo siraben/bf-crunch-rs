@@ -1,4 +1,14 @@
-# BF Crunch #
+# Port of BF Crunch to Rust
+
+This repository is a port of the legendary
+[BF-Crunch](https://github.com/primo-ppcg/BF-Crunch) project that was
+used in this [StackExchange code
+golf](https://codegolf.stackexchange.com/questions/55422/hello-world/163590#163590)
+to find the shortest BF at the time to output hello world. Here I'm
+mostly using [Codex](https://chatgpt.com/codex) to automate the port,
+and adding extra features and performance improvements over the
+original. The first commit aims to be just the port of the program to
+Rust without any behavioral changes.
 
 Crunches BF programs of the form
 ```
