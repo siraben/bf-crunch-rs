@@ -80,6 +80,9 @@ pub fn to_iso_8859_1_bytes(input: &str) -> Result<Vec<u8>> {
     Ok(bytes)
 }
 
+/**
+ * https://graphics.stanford.edu/~seander/bithacks.html#IntegerAbs
+ **/
 pub fn abs_diff(a: u8, b: u8) -> i32 {
     let a = a as i32;
     let b = b as i32;

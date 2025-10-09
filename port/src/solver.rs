@@ -56,6 +56,8 @@ impl Solver {
     }
 
     fn exhaustive(&mut self, cost: i32, start: usize, pointer: i32, max_cost: i32) -> Option<Path> {
+        // lots of code repetition for the sake of speed :/
+        // let zeros = (0..=self.max_pointer).filter(|&x| self.tape[x as usize] == 0).collect::<Vec<_>>();
         if start == self.goal.len() {
             return Some(Path::new());
         }
