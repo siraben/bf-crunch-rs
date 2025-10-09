@@ -1,3 +1,5 @@
+//! Command-line configuration for the Brainf**k cruncher CLI.
+
 use clap::{ArgAction, Parser};
 
 #[derive(Parser, Debug, Clone)]
@@ -8,6 +10,7 @@ use clap::{ArgAction, Parser};
     override_usage = "bfcrunch [--options] text [limit]",
     about = "Crunches BF programs to produce a given text."
 )]
+/// Parsed command-line options controlling the cruncher search.
 pub struct Options {
     /// The text to produce.
     #[arg(value_name = "text", help = "The text to produce.")]

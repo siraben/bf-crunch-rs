@@ -1,3 +1,6 @@
+//! Generates initialization candidates for Brainf**k programs and evaluates
+//! them with the search solver to find programs that emit a requested string.
+
 use std::cmp::{max, min};
 use std::collections::BTreeMap;
 
@@ -14,23 +17,39 @@ const MODINV256: [i32; 40] = [
     41, 0, 19, 0, 53, 0, 223, 0, 225, 0, 139, 0, 173, 0, 151,
 ];
 
+/// Generates candidate BF initialization segments and validates them against
+/// the desired output using the [`Solver`].
 pub struct Cruncher {
+    /// Minimum allowed tape span for candidate programs.
     min_tape: i32,
+    /// Maximum allowed tape span for candidate programs.
     max_tape: i32,
+    /// Maximum per-node cost permitted when searching the solver tree.
     max_node_cost: i32,
+    /// Cap on fill-loop iterations when building the initial tape (unused).
     _max_loops: i32,
+    /// Minimum length of the `s` segment in the initialization prefix.
     min_slen: i32,
+    /// Maximum length of the `s` segment in the initialization prefix.
     max_slen: i32,
+    /// Minimum length of the `c` segment in the initialization prefix.
     min_clen: i32,
+    /// Maximum length of the `c` segment in the initialization prefix.
     max_clen: i32,
+    /// Target output in ISO-8859-1 bytes.
     goal: Vec<u8>,
+    /// Current search limit for total program length.
     limit: i32,
+    /// Whether to tighten `limit` whenever a shorter program is discovered.
     rolling_limit: bool,
+    /// Whether solver nodes must touch distinct tape cells.
     unique_cells: bool,
+    /// Print full BF programs instead of only initialization segments.
     print_full_program: bool,
 }
 
 impl Cruncher {
+    /// Creates a new cruncher configured from command-line [`Options`].
     pub fn new(options: &Options) -> Result<Self> {
         let decoded = unescape_regex_like(&options.text)?;
         let goal = to_iso_8859_1_bytes(&decoded)?;
@@ -135,6 +154,9 @@ impl Cruncher {
         }
     }
 
+    /// Attempts to complete the initialization segment with solver output and
+    /// reports any successful program. Optionally mirrors the `c` segment to
+    /// explore both tails.
     fn try_solve(
         &mut self,
         len: i32,
@@ -202,6 +224,8 @@ impl Cruncher {
         }
     }
 
+    /// Emits a solver solution, optionally reconstructing the full BF program
+    /// tail, and returns the resulting program length.
     fn report_solution(
         &self,
         len: i32,
@@ -241,6 +265,9 @@ impl Cruncher {
         program_len
     }
 
+    /// Builds the initial tape state for a particular combination of segment
+    /// parameters. Returns the pointer location and the initialized tape on
+    /// success.
     fn fill_tape(
         &self,
         s: &[i32],
@@ -347,6 +374,7 @@ impl Cruncher {
     }
 }
 
+/// Converts initialization parameters into a BF program prefix string.
 fn to_bf_string(s: &[i32], c: &[i32], k: &[i32; 2], j: &[i32; 2], h: i32) -> String {
     let mut sb = String::new();
     let mut sdelim = '[';
@@ -380,6 +408,7 @@ fn to_bf_string(s: &[i32], c: &[i32], k: &[i32; 2], j: &[i32; 2], h: i32) -> Str
     sb
 }
 
+/// Builds the BF command suffix that reproduces the solver path on the tape.
 fn build_output_sequence(
     path: &crate::path::Path,
     goal: &[u8],
@@ -431,6 +460,7 @@ fn build_output_sequence(
     sequence
 }
 
+/// Appends `count` copies of `ch` to the provided string buffer.
 fn append_repeated(sb: &mut String, ch: char, count: i32) {
     for _ in 0..count {
         sb.push(ch);
@@ -500,6 +530,7 @@ fn k_list_gen(len: i32) -> Vec<[i32; 2]> {
     result
 }
 
+/// Generates all possible j-lists whose BF translation has the given length.
 fn j_list_gen(len: i32) -> Vec<[i32; 2]> {
     let mut result = Vec::new();
     for i in 1..len {

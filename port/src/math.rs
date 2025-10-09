@@ -1,3 +1,7 @@
+//! Minimal math helpers used by the solver.
+
+/// Returns the index of the first element in `slice` that is not less than
+/// `value`, mimicking C++'s `lower_bound`.
 pub fn lower_bound(slice: &[i32], value: i32) -> usize {
     if slice.is_empty() {
         return 0;

@@ -1,5 +1,10 @@
+//! Miscellaneous helpers for parsing escapes and manipulating Brainf**k tape
+//! values.
+
 use anyhow::{anyhow, bail, Result};
 
+/// Expands a subset of regular-expression-style escapes within `input` and
+/// returns the unescaped string.
 pub fn unescape_regex_like(input: &str) -> Result<String> {
     let mut output = String::with_capacity(input.len());
     let mut chars = input.chars();
@@ -69,6 +74,8 @@ pub fn unescape_regex_like(input: &str) -> Result<String> {
     Ok(output)
 }
 
+/// Converts the supplied string into ISO-8859-1 bytes, erroring on characters
+/// that fall outside the encoding.
 pub fn to_iso_8859_1_bytes(input: &str) -> Result<Vec<u8>> {
     let mut bytes = Vec::with_capacity(input.len());
     for ch in input.chars() {
@@ -88,20 +95,24 @@ pub fn abs_diff(a: u8, b: u8) -> i32 {
     (a - b).abs()
 }
 
+/// Adds `delta` to `value` using wrapping arithmetic on 8-bit cells.
 pub fn add_byte(value: u8, delta: i32) -> u8 {
     value.wrapping_add(delta as u8)
 }
 
+/// Returns the two's-complement negation of `value`.
 pub fn negate_byte(value: u8) -> u8 {
     (-(value as i32)) as u8
 }
 
+/// Converts a pair of hexadecimal digits to the corresponding byte.
 fn hex_pair_to_u8(hi: char, lo: char) -> Result<u8> {
     let high = digit_to_value(hi)?;
     let low = digit_to_value(lo)?;
     Ok(((high << 4) | low) as u8)
 }
 
+/// Translates a single hexadecimal digit into its integer value.
 fn digit_to_value(ch: char) -> Result<i32> {
     match ch {
         '0'..='9' => Ok((ch as i32) - ('0' as i32)),

@@ -1,3 +1,7 @@
+//! Entry point for the `bfcrunch` command-line application.
+//! Parses command-line options and orchestrates the search for Brainf**k
+//! programs that produce a user-specified output string.
+
 mod cruncher;
 mod math;
 mod node;
@@ -12,6 +16,7 @@ use clap::Parser;
 use crate::cruncher::Cruncher;
 use crate::options::Options;
 
+/// Launches the Brainf**k cruncher CLI with the provided arguments.
 fn main() -> Result<()> {
     let opts = Options::parse();
     let mut cruncher = Cruncher::new(&opts)?;

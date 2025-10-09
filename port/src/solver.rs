@@ -1,21 +1,35 @@
+//! Provides the search engine that explores possible Brainf**k tape states to
+//! extend initialization prefixes into full programs.
+
 use crate::math::lower_bound;
 use crate::node::Node;
 use crate::path::Path;
 use crate::util::abs_diff;
 
 #[derive(Clone)]
+/// Exhaustive search engine that attempts to match the target output by
+/// traversing Brainf**k tape mutations.
 pub struct Solver {
+    /// Desired output sequence.
     goal: Vec<u8>,
+    /// Working copy of the tape state.
     tape: Vec<u8>,
+    /// Lower bound on the total traversal cost.
     min_cost: i32,
+    /// Current pointer position.
     pointer: i32,
+    /// Furthest pointer position considered valid.
     max_pointer: i32,
+    /// Maximum allowed node cost in the search tree.
     max_node_cost: i32,
+    /// If true, prevents revisiting the same cell in the solution.
     unique_cells: bool,
+    /// Cached zero-cell indices to accelerate zip operations.
     zeros: Vec<i32>,
 }
 
 impl Solver {
+    /// Constructs a solver ready to explore completions for the supplied tape.
     pub fn new(
         goal: &[u8],
         tape: Vec<u8>,
@@ -51,10 +65,13 @@ impl Solver {
         }
     }
 
+    /// Searches for a feasible output path whose cost does not exceed
+    /// `max_cost`.
     pub fn solve(&mut self, max_cost: i32) -> Option<Path> {
         self.exhaustive(0, 0, self.pointer, max_cost - self.min_cost)
     }
 
+    /// Core exhaustive search routine that explores the solution space.
     fn exhaustive(&mut self, cost: i32, start: usize, pointer: i32, max_cost: i32) -> Option<Path> {
         // Keep the duplication to avoid abstraction overhead and maintain solver performance.
         // Alternative reference: recompute zeros with
@@ -601,6 +618,7 @@ impl Solver {
         min_path
     }
 
+    /// Rebuilds the list of tape positions containing zero.
     fn recompute_zeros(&mut self) {
         self.zeros = (0..=self.max_pointer)
             .filter(|&i| {
