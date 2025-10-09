@@ -377,32 +377,55 @@ impl Cruncher {
 /// Converts initialization parameters into a BF program prefix string.
 fn to_bf_string(s: &[i32], c: &[i32], k: &[i32; 2], j: &[i32; 2], h: i32) -> String {
     let mut sb = String::new();
-    let mut sdelim = '[';
-    for &sterm in s {
-        let mut prefix = String::new();
-        let sign = if sterm < 0 { '-' } else { '+' };
-        for _ in 0..sterm.abs() {
-            prefix.push(sign);
+
+    if !s.is_empty() {
+        let mut segments = Vec::with_capacity(s.len());
+        for (idx, &sterm) in s.iter().enumerate() {
+            let mut segment = String::new();
+            let sign = if sterm < 0 { '-' } else { '+' };
+            push_repeated(&mut segment, sign, sterm.unsigned_abs() as usize);
+            segment.push(if idx == 0 { '[' } else { '<' });
+            segments.push(segment);
         }
-        prefix.push(sdelim);
-        sb = format!("{}{}", prefix, sb);
-        sdelim = '<';
+        for segment in segments.into_iter().rev() {
+            sb.push_str(&segment);
+        }
     }
 
-    append_repeated(&mut sb, if k[0] < 0 { '-' } else { '+' }, k[0].abs());
+    push_repeated(
+        &mut sb,
+        if k[0] < 0 { '-' } else { '+' },
+        k[0].unsigned_abs() as usize,
+    );
     sb.push_str("[<");
-    append_repeated(&mut sb, if j[0] < 0 { '-' } else { '+' }, j[0].abs());
+    push_repeated(
+        &mut sb,
+        if j[0] < 0 { '-' } else { '+' },
+        j[0].unsigned_abs() as usize,
+    );
     sb.push('>');
-    append_repeated(&mut sb, '-', j[1].abs());
+    push_repeated(&mut sb, '-', j[1].unsigned_abs() as usize);
     for &cterm in c {
         sb.push('>');
-        append_repeated(&mut sb, if cterm < 0 { '-' } else { '+' }, cterm.abs());
+        push_repeated(
+            &mut sb,
+            if cterm < 0 { '-' } else { '+' },
+            cterm.unsigned_abs() as usize,
+        );
     }
-    append_repeated(&mut sb, '<', c.len() as i32);
+    push_repeated(&mut sb, '<', c.len());
     sb.push(']');
-    append_repeated(&mut sb, if h < 0 { '-' } else { '+' }, h.abs());
+    push_repeated(
+        &mut sb,
+        if h < 0 { '-' } else { '+' },
+        h.unsigned_abs() as usize,
+    );
     sb.push('>');
-    append_repeated(&mut sb, if k[1] < 0 { '-' } else { '+' }, k[1].abs());
+    push_repeated(
+        &mut sb,
+        if k[1] < 0 { '-' } else { '+' },
+        k[1].unsigned_abs() as usize,
+    );
     sb.push(']');
 
     sb
@@ -461,9 +484,9 @@ fn build_output_sequence(
 }
 
 /// Appends `count` copies of `ch` to the provided string buffer.
-fn append_repeated(sb: &mut String, ch: char, count: i32) {
-    for _ in 0..count {
-        sb.push(ch);
+fn push_repeated(sb: &mut String, ch: char, count: usize) {
+    if count > 0 {
+        sb.extend(std::iter::repeat(ch).take(count));
     }
 }
 
