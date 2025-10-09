@@ -1,3 +1,18 @@
+# Rust Port of BF-Crunch
+
+This repository is a port of the legendary
+[BF-Crunch](https://github.com/primo-ppcg/BF-Crunch) project that was
+used in this [StackExchange code
+golf](https://codegolf.stackexchange.com/questions/55422/hello-world/163590#163590)
+to find the shortest BF at the time to output hello world. Here I'm
+mostly using [Codex](https://chatgpt.com/codex) to automate the port,
+and adding extra features and performance improvements over the
+original. The first commit aims to be just the port of the program to
+Rust without any behavioral changes.
+
+When possible, new features are added behind flags so as to not break
+compatibility with the original.
+
 
 ## Description
 
@@ -41,7 +56,7 @@ Options:
   -?, --help               Display this help text.
 ```
 
-## Output ##
+## Output
 
 Output is given in three lines:
  1. Total length of the program found, and the initialization segment.
@@ -61,13 +76,24 @@ This corresponds to the full program:
 ++++[[<+>->+++++>+<<]>]<<<<.<+.>++++..+++.<<<.>+++.>>.+++.>.<<-.
 ```
 
-## Notes on Rust Port
-This repository is a port of the legendary
-[BF-Crunch](https://github.com/primo-ppcg/BF-Crunch) project that was
-used in this [StackExchange code
-golf](https://codegolf.stackexchange.com/questions/55422/hello-world/163590#163590)
-to find the shortest BF at the time to output hello world. Here I'm
-mostly using [Codex](https://chatgpt.com/codex) to automate the port,
-and adding extra features and performance improvements over the
-original. The first commit aims to be just the port of the program to
-Rust without any behavioral changes.
+## Printing full program
+If you use the flag `--full-program` it will also show the complete
+programs, instead of just the offsets.
+
+```
+$ bfcrunch "hello world" 70 -r -i23 --full-program
+init-len: 14; limit: 70
+init-len: 15; limit: 70
+init-len: 16; limit: 70
+init-len: 17; limit: 70
+init-len: 18; limit: 70
+init-len: 19; limit: 70
+71: -[[<++>->->---<<]>+]<<<<<----.---.<--..<<<---.<<<++.>+++.>>.+++.>>>.>-.
+79: -[--[<+>->+>>+<<<]>]<<<<<++.---.<<<<<<<<<<<<<<<<-..<<<.<<.>++.>.+++.>>>.>>>+++.
+77: -[[<++>->+>+++<<]->]<<<<+.---.>-----..<<<<<<--.<<<<+.>>>>>--.<.+++.>>>>>>.<-.
+78: -[[<+>->->>--<<<]>+]<<<<<++++.---.+++++++..+++.>-.>---.<<.+++.------.--------.
+79: -[[<+>->++>+++<<]>+]<<<<<<<+++++++.---.>>--..+++.<-----.<<+.>>>.+++.------.<<-.
+78: -[[<+>->+>>---<<<]>]<<++++++++.---.<+..+++.<.>++++++++.--------.+++.------.>-.
+192:
++[[<+>->+++<]---->+]<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<.---.+++++++..+++.<<----.>++.>.+++.>>>-.--------.
+```
