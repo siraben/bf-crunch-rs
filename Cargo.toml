@@ -1,6 +1,6 @@
 [workspace]
-members = ["crates/bf-crunch"]
-default-members = ["crates/bf-crunch"]
+members = ["port"]
+default-members = ["port"]
 resolver = "2"
 
 [workspace.dependencies]
