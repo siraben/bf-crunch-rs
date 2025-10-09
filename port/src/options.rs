@@ -1,4 +1,6 @@
-//! Command-line configuration for the Brainf**k cruncher CLI.
+//! Command-line configuration for the Brainf**k cruncher CLI. The options
+//! expose segment-length limits for the `s/k/j/c/h/k` layout used when
+//! constructing initialization prefixes.
 
 use clap::{ArgAction, Parser};
 

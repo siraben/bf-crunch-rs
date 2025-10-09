@@ -16,11 +16,26 @@ compatibility with the original.
 
 ## Description
 
-Crunches BF programs of the form
+
+The solver specializes in BF programs whose initialization prefix follows this
+template:
 ```
 {...s2}<{s1}<{s0}[{k0}[<{j0}>{j1}>{c0}>{c1}>{c2...}<<<]{h}>{k1}]
 ```
-of the given length. Programs of this form fill the tape with simple recurrence relations.
+
+The notation breaks the prefix into reusable segments:
+
+- **`s`-segment** (`{...s2}<{s1}<{s0}`) seeds the tape with a stack of additive
+  adjustments, each delimited by `[` or `<`, that prepares the loop structure.
+- **`k` segments** (`{k0}` / `{k1}`) tweak the loop entry and exit cells by
+  applying signed runs of `+` or `-` instructions before and after the main
+  loop.
+- **`j`-segment** (`<{j0}>{j1}`) performs the loop zipping motion that copies
+  values across the tape.
+- **`c`-segment** (`>{c0}>{c1}>{c2...}`) describes the core recurrence that
+  distributes scaled values to neighboring tape cells.
+- **`h` adjustment** (`{h}`) rebalances the loop counter after distributing
+  the `c`-segment contributions.
 
 The shortest useful program of this type has length 14:
 ```

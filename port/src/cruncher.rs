@@ -1,5 +1,12 @@
 //! Generates initialization candidates for Brainf**k programs and evaluates
 //! them with the search solver to find programs that emit a requested string.
+//!
+//! Each candidate follows the canonical `{s}{k}{j}{c}{h}{k}` layout: the `s`
+//! segment seeds nested additive adjustments, the two `k` segments tweak loop
+//! entry and exit cells, the `j` segment performs pointer zipping, the `c`
+//! segment applies the recurrence that distributes values, and the `h`
+//! adjustment restores the loop counter. Segment lengths are configurable via
+//! [`Options`].
 
 use std::cmp::{max, min};
 use std::collections::BTreeMap;
@@ -18,7 +25,8 @@ const MODINV256: [i32; 40] = [
 ];
 
 /// Generates candidate BF initialization segments and validates them against
-/// the desired output using the [`Solver`].
+/// the desired output using the [`Solver`]. The field names mirror the segment
+/// terminology (`s`, `k`, `j`, `c`, `h`) used throughout the documentation.
 pub struct Cruncher {
     /// Minimum allowed tape span for candidate programs.
     min_tape: i32,
@@ -374,7 +382,8 @@ impl Cruncher {
     }
 }
 
-/// Converts initialization parameters into a BF program prefix string.
+/// Serialises the `s/k/j/c/h/k` segment parameters into a BF initialization
+/// prefix.
 fn to_bf_string(s: &[i32], c: &[i32], k: &[i32; 2], j: &[i32; 2], h: i32) -> String {
     let mut sb = String::new();
 
