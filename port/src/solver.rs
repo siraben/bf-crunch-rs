@@ -56,8 +56,9 @@ impl Solver {
     }
 
     fn exhaustive(&mut self, cost: i32, start: usize, pointer: i32, max_cost: i32) -> Option<Path> {
-        // lots of code repetition for the sake of speed :/
-        // let zeros = (0..=self.max_pointer).filter(|&x| self.tape[x as usize] == 0).collect::<Vec<_>>();
+        // Keep the duplication to avoid abstraction overhead and maintain solver performance.
+        // Alternative reference: recompute zeros with
+        // (0..=self.max_pointer).filter(|&x| self.tape[x as usize] == 0).collect::<Vec<_>>().
         if start == self.goal.len() {
             return Some(Path::new());
         }
@@ -76,7 +77,7 @@ impl Solver {
             return None;
         }
 
-        // stay on same pointer
+        // Stay on the same pointer.
         if pointer >= 0 {
             let idx = pointer as usize;
             if idx < self.tape.len() {
@@ -113,7 +114,7 @@ impl Solver {
             }
         }
 
-        // move left
+        // Move left.
         if pointer > 0 {
             for i in 1..i_max {
                 if i > pointer {
@@ -157,7 +158,7 @@ impl Solver {
             }
         }
 
-        // move right
+        // Move right.
         if pointer < self.max_pointer {
             for i in 1..i_max {
                 if pointer + i > self.max_pointer {
@@ -201,7 +202,7 @@ impl Solver {
             }
         }
 
-        // zip to previous zero [<]
+        // Zip to previous zero [<].
         if pointer > 0 {
             let mut pj = 0;
             while pj <= pointer {
@@ -218,7 +219,7 @@ impl Solver {
                 if pz_idx >= 0 {
                     let prev_zero = self.zeros[pz_idx as usize];
 
-                    // from prev_zero going left
+                    // From the previous zero moving further left.
                     for i in 1..i_max {
                         if i >= i_max - 3 {
                             break;
@@ -266,7 +267,7 @@ impl Solver {
                         }
                     }
 
-                    // from prev_zero going right towards pointer
+                    // From the previous zero moving back toward the pointer.
                     for i in 1..i_max {
                         if i >= i_max - 3 {
                             break;
@@ -315,7 +316,7 @@ impl Solver {
                         }
                     }
 
-                    // roll to previous zero [.<]
+                    // Roll to previous zero [.<].
                     let mut run_len = pointer - pj - prev_zero;
                     while pj < 1
                         && pointer - pj < self.max_pointer
@@ -401,7 +402,7 @@ impl Solver {
             }
         }
 
-        // zip to next zero [>]
+        // Zip to next zero [>].
         if pointer <= self.max_pointer {
             let mut nj = 0;
             while pointer + nj <= self.max_pointer {
@@ -417,7 +418,7 @@ impl Solver {
                 if nz_idx < self.zeros.len() {
                     let next_zero = self.zeros[nz_idx];
 
-                    // from next_zero to the right
+                    // From the next zero moving further right.
                     for i in 1..i_max {
                         if i >= i_max - 3 {
                             break;
@@ -462,7 +463,7 @@ impl Solver {
                         }
                     }
 
-                    // from next_zero back towards pointer
+                    // From the next zero moving back toward the pointer.
                     for i in 1..i_max {
                         if i >= i_max - 3 {
                             break;
@@ -511,7 +512,7 @@ impl Solver {
                         }
                     }
 
-                    // roll to next zero [.>]
+                    // Roll to next zero [.>].
                     let mut run_len = next_zero - pointer - nj;
                     while nj < 1
                         && pointer + nj > 0

@@ -7,8 +7,8 @@ use crate::options::Options;
 use crate::solver::Solver;
 use crate::util::{add_byte, negate_byte, to_iso_8859_1_bytes, unescape_regex_like};
 
-//  1       3       5       7      9      11      13      15      17      19
-// 21      23      25      27     29      31      33      35      37      39
+/// Precomputed modular inverses modulo 256 for the odd values 1, 3, ..., 39.
+/// Matches the lookup table documented in the original C# implementation.
 const MODINV256: [i32; 40] = [
     0, 1, 0, 171, 0, 205, 0, 183, 0, 57, 0, 163, 0, 197, 0, 239, 0, 241, 0, 27, 0, 61, 0, 167, 0,
     41, 0, 19, 0, 53, 0, 223, 0, 225, 0, 139, 0, 173, 0, 151,
@@ -64,14 +64,11 @@ impl Cruncher {
         })
     }
 
-    /**
-     * Crunches BF programs of the form
-     * {...s2}<{s1}<{s0}[{k0}[<{j0}>{j1}>{c0}>{c1}>{c2...}<<<]{h}>{k1}]
-     *
-     * The shortest useful program of this type has length 14
-     * +[[<+>->++<]>]
-     * which computes the powers of 2 as f(n) = 2*f(n-1), f(0) = 1
-     */
+    /// Crunches BF programs of the form
+    /// `{...s2}<{s1}<{s0}[{k0}[<{j0}>{j1}>{c0}>{c1}>{c2...}<<<]{h}>{k1}]`.
+    ///
+    /// The shortest useful program of this type has length 14 (`+[[<+>->++<]>]`),
+    /// which computes the powers of two as `f(n) = 2 * f(n - 1)` with `f(0) = 1`.
     pub fn crunch(&mut self, len: i32) {
         println!("init-len: {}; limit: {}", len, self.limit);
 
@@ -169,7 +166,7 @@ impl Cruncher {
         }
 
         if c.len() > 1 {
-            // same tape, different tail
+            // Reuse the same tape while flipping the tail to explore the mirrored program.
             for i in 1..=c.len() {
                 let idx = (pntr + i as i32) as usize;
                 if idx < tape.len() {
@@ -289,7 +286,7 @@ impl Cruncher {
             return None;
         }
 
-        // leave a zero at the beginning for a zip point
+        // Leave a zero at the beginning for a zip point.
         let mut pntr = 2i32;
         let stop = self.max_tape - c.len() as i32;
         if stop <= pntr {
